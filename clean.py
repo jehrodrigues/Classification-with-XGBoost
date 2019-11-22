@@ -46,8 +46,38 @@ class Clean(object):
         #Implementar tecnica para tratar ruido
         return self.train, self.test
 
-    def remove_outliers(self):
-        #Implementar tecnica para remover outlier (plotar para descobrir os outliers)
+    #Remove outliers for a specif column in a dataframe
+    #It is necessary specific the dataframe(0 for train and 1 > for test),
+    #the column (must be a relevant column)
+    #and the interval for identify the outliers (default is 1.5)
+    def remove_outliers(self, df_select, column, interv=1.5):
+        self.df_select = df_select #select the dataframe
+        self.column = column #select the column to do the boxplot
+        self.interv = interv #select the value to define the outliers interval
+        
+        #Do the boxplot for train data and remove outliers by column specified
+        if(self.df_select == 0):            
+            data = self.train.iloc[:,self.column].sort_values(ascending=True)
+            data = data.values
+            r = plt.boxplot(data, 0, 'gD', 1, self.interv)
+            bottom_points = r["whiskers"][0].get_data()[1]
+            top_points = r["whiskers"][1].get_data()[1]
+            bottom_points = bottom_points[0]
+            top_points = top_points[0]
+            train_ = self.train[self.train.iloc[:,self.column] >= bottom_points]
+            train_ = train_[train_.iloc[:,self.column] <= top_points]
+            return train_
+        else:#Do the boxplot for teste data
+            data = self.test.iloc[:,self.column].sort_values(ascending=True)
+            data = data.values
+            r = plt.boxplot(data, 0, 'gD', 1, self.interv)
+            bottom_points = r["whiskers"][0].get_data()[1]
+            top_points = r["whiskers"][1].get_data()[1]
+            bottom_points = bottom_points[0]
+            top_points = top_points[0]
+            test_ = self.test[self.test.iloc[:,self.column] >= bottom_points]
+            test_ = test_[test_.iloc[:,self.column] <= top_points]
+            return self.test
         return self.train, self.test
 
     

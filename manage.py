@@ -1,28 +1,26 @@
-import numpy as np
-import matplotlib.pyplot as plt
 import pandas as pd
 
 from clean import Clean
 from statistic import Statistic
 from plot import Plot
+from reduction import Reduction
+from classifier import Classifier
 
 # Main
 train = pd.read_csv("../data/train.csv")
 test = pd.read_csv("../data/test.csv")
 
+
+
 train, test = Clean(train, test).remove_constant()
+
+#Plot(train, test).plot_line()
+
 train, test = Clean(train, test).remove_duplicates()
 
-print train.head(),'\n'
-print test.head(),'\n'
+#Plot(train, test).plot_line()
 
-#print train.describe(),'\n'
-#print test.describe(),'\n'
+train, test, target, test_id = Reduction(train, test).principal_component_analysis()
 
-df = pd.DataFrame(train.TARGET.value_counts())
-df['Percentage'] = 100*df['TARGET']/train.shape[0]
-print df
-
-plt.plot(train[:100])
-plt.ylabel('train')
-plt.show()
+Classifier(train, test, target, test_id).xgboost() #Com PCA
+#Classifier(train, test, '', '').xgboost() #Sem PCA
